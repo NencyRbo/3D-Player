@@ -1,0 +1,41 @@
+/**app.wxss**/
+.container {
+  min-height: 100vh;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+} 
+
+/**app.less**/
+page {
+  background-color: #f8f9fa;
+  font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Helvetica,
+    Segoe UI, Arial, Roboto, 'PingFang SC', 'miui', 'Hiragino Sans GB', 'Microsoft Yahei',
+    sans-serif;
+  font-size: 28rpx;
+  line-height: 1.5;
+  color: #333;
+} 
+
+button {
+  margin: 0;
+  padding: 0;
+  background: none;
+  border: none;
+  text-align: left;
+  line-height: inherit;
+  overflow: visible;
+
+  &::after {
+    border: none;
+  }
+}
+
+input {
+  outline: none;
+}
+
+.scrollarea {
+  flex: 1;
+  overflow-y: hidden;
+} 

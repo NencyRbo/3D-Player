@@ -1,0 +1,115 @@
+<!--index.wxml-->
+<view class="page-container">
+  <view class="content-wrapper">
+    <view class="header">
+      <view class="header-title">AI图像生成器</view>
+      <view class="header-subtitle">输入描述，创造精彩图像</view>
+    </view>
+
+    <view class="card input-card">
+      <view class="card-title">创建您的图像</view>
+      <view class="input-section">
+        <input 
+          class="prompt-input" 
+          model:value="{{prompt}}" 
+          placeholder="请描述您想要生成的图像..." 
+          type="text"
+          bindfocus="handleInputFocus"
+          bindblur="handleInputBlur"
+          confirm-type="done"
+        />
+        <view class="reset-btn" bindtap="resetForm" wx:if="{{prompt}}">
+          <text class="reset-icon">×</text>
+        </view>
+      </view>
+      
+      <view class="tips-section">
+        <text class="tips-text">提示：尝试输入详细的描述，例如"一座岛屿在海边，海鸥飞翔，月光照耀着大海，灯塔，远处有船"</text>
+      </view>
+      
+      <view class="button-section">
+        <button class="generate-btn" bindtap="generateImage" loading="{{isLoading}}" disabled="{{isLoading || !prompt}}">
+          <view class="btn-content">
+            <text class="btn-text">{{isLoading ? '生成中...' : '生成图像'}}</text>
+            <text class="btn-icon" wx:if="{{!isLoading}}">✨</text>
+          </view>
+        </button>
+      </view>
+    </view>
+    
+    <view class="card image-card">
+      <view class="card-title">生成结果</view>
+      <view class="image-wrapper {{generatedImage ? 'has-image' : ''}}">
+        <view class="image-section">
+          <image 
+            wx:if="{{generatedImage}}" 
+            src="{{generatedImage}}" 
+            mode="aspectFit"
+            class="generated-image"
+            show-menu-by-longpress
+            bindload="handleImageLoad"
+            bindtap="previewImage"
+          />
+          <view wx:else class="placeholder">
+            <view class="placeholder-icon">🖼️</view>
+            <text class="placeholder-text">您的图像将在这里显示</text>
+          </view>
+        </view>
+        
+        <view class="loading-overlay" wx:if="{{isLoading}}">
+          <view class="loading-spinner">
+            <view class="spinner-circle"></view>
+            <view class="spinner-inner-circle"></view>
+          </view>
+          <text class="loading-text">正在创作您的图像...</text>
+        </view>
+      </view>
+      
+      <view wx:if="{{error}}" class="error-message">
+        <text class="error-icon">⚠️</text>
+        <text>{{error}}</text>
+      </view>
+      
+      <view class="image-actions" wx:if="{{generatedImage}}">
+        <button class="action-btn save-btn" bindtap="saveImage">
+          <text class="action-icon">💾</text>
+          <text class="action-text">保存图像</text>
+        </button>
+        
+        <button class="action-btn share-btn" bindtap="shareImage">
+          <text class="action-icon">📤</text>
+          <text class="action-text">分享图像</text>
+        </button>
+        
+        <button class="action-btn regenerate-btn" bindtap="generateImage">
+          <text class="action-icon">🔄</text>
+          <text class="action-text">重新生成</text>
+        </button>
+      </view>
+    </view>
+  </view>
+
+  <view class="footer">
+    <button class="back-btn" bindtap="navigateBack">
+      <text class="back-icon">←</text>
+      <text class="back-text">返回首页</text>
+    </button>
+  </view>
+  
+  <view class="bg-shapes">
+    <view class="shape shape1"></view>
+    <view class="shape shape2"></view>
+    <view class="shape shape3"></view>
+  </view>
+  
+  <!-- 全屏图片预览 -->
+  <view class="fullscreen-preview {{isPreviewActive ? 'active' : ''}}" bindtap="closePreview">
+    <image 
+      src="{{generatedImage}}" 
+      mode="aspectFit" 
+      class="preview-image" 
+      catchtap="stopPropagation"
+    />
+    <view class="preview-close" catchtap="closePreview">×</view>
+  </view>
+</view>

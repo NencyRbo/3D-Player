@@ -1,0 +1,103 @@
+<!--home.wxml-->
+<view class="container">
+  <!-- 粒子背景 -->
+  <view class="particles-container">
+    <view class="particle p1" style="top: 10%; left: 20%;"></view>
+    <view class="particle p2" style="top: 30%; left: 70%;"></view>
+    <view class="particle p3" style="top: 70%; left: 30%;"></view>
+    <view class="particle p4" style="top: 85%; left: 15%;"></view>
+    <view class="particle p5" style="top: 40%; left: 80%;"></view>
+  </view>
+
+  <!-- 主内容区域 -->
+  <view class="main-content">
+    <!-- 顶部区域 -->
+    <view class="header-section">
+      <view class="logo-container" animation="{{pulseAnimation}}">
+        <text class="logo-text">AI</text>
+      </view>
+      <text class="header-title">AI图像生成器</text>
+    </view>
+
+    <!-- 推荐3D视频栏目 -->
+    <view class="section-container">
+      <view class="section-header">
+        <text class="section-title">推荐3D视频</text>
+        <text class="section-more">更多</text>
+      </view>
+      <scroll-view class="video-scroll" scroll-x="true" enable-flex="true">
+        <view class="video-card" wx:for="{{recommendVideos}}" wx:key="id" bindtap="navigateToPlayer" data-id="{{item.id}}">
+          <image class="video-thumb" src="{{item.thumbnail}}" mode="aspectFill"></image>
+          <view class="video-info">
+            <text class="video-title">{{item.title}}</text>
+            <view class="video-tag">3D</view>
+          </view>
+        </view>
+      </scroll-view>
+    </view>
+
+    <!-- 最近观看 -->
+    <view class="section-container">
+      <view class="section-header">
+        <text class="section-title">最近观看</text>
+        <text class="section-more">查看全部</text>
+      </view>
+      <scroll-view class="video-scroll" scroll-x="true" enable-flex="true">
+        <view class="video-card" wx:for="{{recentVideos}}" wx:key="id" bindtap="navigateToPlayer" data-id="{{item.id}}">
+          <image class="video-thumb" src="{{item.thumbnail}}" mode="aspectFill"></image>
+          <view class="video-info">
+            <text class="video-title">{{item.title}}</text>
+            <text class="video-time">{{item.duration}}</text>
+          </view>
+        </view>
+      </scroll-view>
+    </view>
+
+    <!-- AI创作专区 -->
+    <view class="section-container">
+      <view class="section-header">
+        <text class="section-title">AI创作专区</text>
+        <text class="section-more" bindtap="navigateToCreate">开始创作</text>
+      </view>
+      <view class="ai-create-grid">
+        <view class="ai-create-card" bindtap="navigateToCreate" data-type="image">
+          <text class="ai-create-icon">🖼️</text>
+          <text class="ai-create-title">图片生成</text>
+          <text class="ai-create-desc">AI智能生成图片</text>
+        </view>
+        <view class="ai-create-card" bindtap="navigateToCreate" data-type="video">
+          <text class="ai-create-icon">🎬</text>
+          <text class="ai-create-title">视频增强</text>
+          <text class="ai-create-desc">提升视频质量</text>
+        </view>
+        <view class="ai-create-card" bindtap="navigateToCreate" data-type="3d">
+          <text class="ai-create-icon">🎮</text>
+          <text class="ai-create-title">3D效果</text>
+          <text class="ai-create-desc">添加3D特效</text>
+        </view>
+      </view>
+    </view>
+    
+    <!-- 底部导航 -->
+    <view class="footer">
+      <view class="nav-links">
+        <view class="nav-item active">
+          <text class="nav-icon">🏠</text>
+          <text>首页</text>
+        </view>
+        <view class="nav-item">
+          <text class="nav-icon">🎥</text>
+          <text>视频库</text>
+        </view>
+        <view class="nav-item" bindtap="navigateToCreate">
+          <text class="nav-icon">✨</text>
+          <text>创作中心</text>
+        </view>
+        <view class="nav-item" bindtap="navigateToProfile">
+          <text class="nav-icon">👤</text>
+          <text>我的</text>
+        </view>
+      </view>
+    </view>
+  </view>
+</view> 

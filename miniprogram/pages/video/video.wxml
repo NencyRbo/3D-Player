@@ -1,0 +1,61 @@
+<!--video.wxml-->
+<view class="container">
+  <!-- 顶部搜索栏 -->
+  <view class="search-bar">
+    <input class="search-input" placeholder="搜索视频" confirm-type="search" bindconfirm="onSearch"/>
+    <view class="search-icon">🔍</view>
+  </view>
+
+  <!-- 分类标签栏 -->
+  <scroll-view class="category-scroll" scroll-x="true" enable-flex="true" enhanced="true" show-scrollbar="false">
+    <view class="category-item {{currentCategory === 'all' ? 'active' : ''}}" 
+          bindtap="switchCategory" data-category="all">全部</view>
+    <view class="category-item {{currentCategory === 'movie' ? 'active' : ''}}" 
+          bindtap="switchCategory" data-category="movie">电影</view>
+    <view class="category-item {{currentCategory === 'short' ? 'active' : ''}}" 
+          bindtap="switchCategory" data-category="short">短视频</view>
+    <view class="category-item {{currentCategory === 'upload' ? 'active' : ''}}" 
+          bindtap="switchCategory" data-category="upload">我的上传</view>
+    <view class="category-item {{currentCategory === 'ai' ? 'active' : ''}}" 
+          bindtap="switchCategory" data-category="ai">AI生成</view>
+  </scroll-view>
+
+  <!-- 视频网格 -->
+  <view class="video-grid">
+    <view class="video-item" wx:for="{{videos}}" wx:key="id" bindtap="playVideo" data-id="{{item.id}}">
+      <view class="video-thumb-container">
+        <image class="video-thumb" src="{{item.thumbnail}}" mode="aspectFill"></image>
+        <view class="video-badge" wx:if="{{item.is3D}}">3D</view>
+        <view class="video-duration">{{item.duration}}</view>
+      </view>
+      <view class="video-info">
+        <text class="video-title">{{item.title}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 上传按钮 -->
+  <view class="upload-button" bindtap="uploadVideo">
+    <text class="upload-icon">+</text>
+  </view>
+  
+  <!-- 底部导航栏 -->
+  <view class="navbar">
+    <view class="nav-item" bindtap="navigateToHome">
+      <text class="nav-icon">🏠</text>
+      <text class="nav-text">首页</text>
+    </view>
+    <view class="nav-item active">
+      <text class="nav-icon">🎥</text>
+      <text class="nav-text">视频库</text>
+    </view>
+    <view class="nav-item" bindtap="navigateToCreate">
+      <text class="nav-icon">✨</text>
+      <text class="nav-text">创作中心</text>
+    </view>
+    <view class="nav-item" bindtap="navigateToProfile">
+      <text class="nav-icon">👤</text>
+      <text class="nav-text">我的</text>
+    </view>
+  </view>
+</view> 

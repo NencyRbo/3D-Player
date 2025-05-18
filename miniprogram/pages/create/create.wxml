@@ -1,0 +1,87 @@
+<!--create.wxml-->
+<view class="container">
+  <!-- 顶部标题栏 -->
+  <view class="header">
+    <text class="header-title">AI创作中心</text>
+  </view>
+
+  <!-- 创作类型选择 -->
+  <view class="creation-types">
+    <view class="type-item {{creationType === 'image' ? 'active' : ''}}" bindtap="switchType" data-type="image">
+      <view class="type-icon">🖼️</view>
+      <view class="type-name">图片生成</view>
+    </view>
+    <view class="type-item {{creationType === 'video' ? 'active' : ''}}" bindtap="switchType" data-type="video">
+      <view class="type-icon">🎬</view>
+      <view class="type-name">视频增强</view>
+    </view>
+    <view class="type-item {{creationType === '3d' ? 'active' : ''}}" bindtap="switchType" data-type="3d">
+      <view class="type-icon">🎮</view>
+      <view class="type-name">3D效果优化</view>
+    </view>
+  </view>
+
+  <!-- 输入区域 -->
+  <view class="input-section">
+    <view class="input-title">创作描述</view>
+    <textarea class="description-input" placeholder="请输入详细描述，如：一只在太空中漂浮的小猫，周围有星球和星云..." bindinput="onDescriptionInput"></textarea>
+    
+    <view class="input-title">选择风格</view>
+    <scroll-view class="style-scroll" scroll-x="true" enable-flex="true">
+      <view class="style-item {{selectedStyle === 'realistic' ? 'active' : ''}}" bindtap="selectStyle" data-style="realistic">写实</view>
+      <view class="style-item {{selectedStyle === 'cartoon' ? 'active' : ''}}" bindtap="selectStyle" data-style="cartoon">卡通</view>
+      <view class="style-item {{selectedStyle === 'art' ? 'active' : ''}}" bindtap="selectStyle" data-style="art">艺术</view>
+      <view class="style-item {{selectedStyle === 'future' ? 'active' : ''}}" bindtap="selectStyle" data-style="future">未来</view>
+      <view class="style-item {{selectedStyle === 'fantasy' ? 'active' : ''}}" bindtap="selectStyle" data-style="fantasy">奇幻</view>
+    </scroll-view>
+    
+    <view class="input-title">上传参考图片（可选）</view>
+    <view class="upload-area" bindtap="uploadReference">
+      <block wx:if="{{referenceImage}}">
+        <image class="reference-image" src="{{referenceImage}}" mode="aspectFill"></image>
+      </block>
+      <block wx:else>
+        <view class="upload-placeholder">
+          <text class="upload-icon">+</text>
+          <text class="upload-text">点击上传参考图片</text>
+        </view>
+      </block>
+    </view>
+  </view>
+
+  <!-- 创建按钮 -->
+  <view class="create-button" bindtap="startCreation">开始创作</view>
+
+  <!-- 创作历史记录 -->
+  <view class="history-section" wx:if="{{creationHistory.length > 0}}">
+    <view class="history-title">历史创作</view>
+    <view class="history-grid">
+      <view class="history-item" wx:for="{{creationHistory}}" wx:key="id" bindtap="previewCreation" data-id="{{item.id}}">
+        <image class="history-thumb" src="{{item.thumbnail}}" mode="aspectFill"></image>
+        <view class="history-info">
+          <text class="history-date">{{item.date}}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 底部导航栏 -->
+  <view class="navbar">
+    <view class="nav-item" bindtap="navigateToHome">
+      <text class="nav-icon">🏠</text>
+      <text class="nav-text">首页</text>
+    </view>
+    <view class="nav-item" bindtap="navigateToVideo">
+      <text class="nav-icon">🎥</text>
+      <text class="nav-text">视频库</text>
+    </view>
+    <view class="nav-item active">
+      <text class="nav-icon">✨</text>
+      <text class="nav-text">创作中心</text>
+    </view>
+    <view class="nav-item" bindtap="navigateToProfile">
+      <text class="nav-icon">👤</text>
+      <text class="nav-text">我的</text>
+    </view>
+  </view>
+</view> 

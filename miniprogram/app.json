@@ -1,0 +1,19 @@
+{
+  "pages": [
+    "pages/home/home",
+    "pages/index/index",
+    "pages/video/video",
+    "pages/create/create",
+    "pages/profile/profile"
+  ],
+  "window": {
+    "backgroundTextStyle": "light",
+    "navigationBarBackgroundColor": "#fff",
+    "navigationBarTitleText": "AI图像生成器",
+    "navigationBarTextStyle": "black"
+  },
+  "style": "v2",
+  "renderer": "webview",
+  "sitemapLocation": "sitemap.json",
+  "lazyCodeLoading": "requiredComponents"
+}

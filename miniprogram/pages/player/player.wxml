@@ -1,0 +1,178 @@
+<!--player.wxml-->
+<view class="container {{isFullscreen ? 'fullscreen' : ''}}">
+  <!-- 视频播放区域 -->
+  <view class="video-container">
+    <video 
+      id="mainVideo" 
+      src="{{videoSrc}}" 
+      poster="{{videoCover}}"
+      controls="{{false}}" 
+      show-center-play-btn="{{false}}"
+      object-fit="{{objectFit}}"
+      bindplay="onPlay"
+      bindpause="onPause"
+      bindtimeupdate="onTimeUpdate"
+      binderror="onVideoError"
+      bindended="onVideoEnd"
+      bindwaiting="onVideoWaiting"
+    ></video>
+    
+    <!-- 自定义播放按钮 -->
+    <view class="play-btn-container" bindtap="togglePlay" wx:if="{{!isPlaying || controls.visible}}">
+      <view class="play-btn {{isPlaying ? 'pause' : 'play'}}"></view>
+    </view>
+    
+    <!-- 加载指示器 -->
+    <view class="loading-indicator" wx:if="{{isBuffering}}">
+      <view class="loading-spinner"></view>
+      <text>视频加载中...</text>
+    </view>
+  </view>
+  
+  <!-- 控制面板 (点击视频区域显示/隐藏) -->
+  <view class="control-panel {{controls.visible ? 'visible' : 'hidden'}}">
+    <!-- 顶部控制区 -->
+    <view class="top-controls">
+      <view class="back-button" bindtap="navigateBack">
+        <text class="icon">←</text>
+      </view>
+      <view class="video-title">{{videoTitle}}</view>
+      <view class="fullscreen-toggle" bindtap="toggleFullscreen">
+        <text class="icon">{{isFullscreen ? '↙' : '↗'}}</text>
+      </view>
+    </view>
+    
+    <!-- 3D效果控制区 -->
+    <view class="effect-controls">
+      <view class="effect-toggle {{is3DEnabled ? 'active' : ''}}" bindtap="toggle3DEffect">
+        <text class="effect-label">3D效果</text>
+        <text class="effect-status">{{is3DEnabled ? '开启' : '关闭'}}</text>
+      </view>
+      
+      <view class="effect-sliders" wx:if="{{is3DEnabled}}">
+        <view class="slider-container">
+          <text class="slider-label">深度</text>
+          <slider min="0" max="100" value="{{depth3D}}" block-size="20" activeColor="#4DACFF" backgroundColor="#cccccc" bindchange="setDepth3D" />
+          <text class="slider-value">{{depth3D}}%</text>
+        </view>
+        
+        <view class="slider-container">
+          <text class="slider-label">视角</text>
+          <slider min="-50" max="50" value="{{angle3D}}" block-size="20" activeColor="#4DACFF" backgroundColor="#cccccc" bindchange="setAngle3D" />
+          <text class="slider-value">{{angle3D > 0 ? '+' + angle3D : angle3D}}</text>
+        </view>
+      </view>
+    </view>
+    
+    <!-- 底部控制区 -->
+    <view class="bottom-controls">
+      <!-- 进度条 -->
+      <view class="progress-bar">
+        <view class="progress-background"></view>
+        <view class="progress-loaded" style="width: {{loadedPercent}}%"></view>
+        <view class="progress-current" style="width: {{currentPercent}}%">
+          <view class="progress-handle"></view>
+        </view>
+        <view class="progress-slider-wrapper">
+          <slider 
+            class="progress-slider" 
+            min="0" 
+            max="{{duration}}" 
+            value="{{currentTime}}" 
+            activeColor="transparent" 
+            backgroundColor="transparent" 
+            block-size="0" 
+            bindchange="seekVideo"
+          />
+        </view>
+      </view>
+      
+      <!-- 时间显示 -->
+      <view class="time-display">
+        <text>{{formatTime(currentTime)}} / {{formatTime(duration)}}</text>
+      </view>
+      
+      <!-- 播放控制 -->
+      <view class="playback-controls">
+        <!-- 播放/暂停按钮 -->
+        <view class="control-button" bindtap="togglePlay">
+          <view class="btn-icon {{isPlaying ? 'pause-icon' : 'play-icon'}}"></view>
+        </view>
+        
+        <!-- 速度控制 -->
+        <view class="control-button" bindtap="toggleSpeedPanel">
+          <text class="btn-text">{{playbackRate}}x</text>
+        </view>
+        
+        <!-- 音量控制 -->
+        <view class="control-button volume-button" bindtap="toggleVolumeSlider">
+          <view class="btn-icon volume-icon"></view>
+        </view>
+        
+        <!-- 陀螺仪控制 -->
+        <view class="control-button {{gyroEnabled ? 'active' : ''}}" bindtap="toggleGyro">
+          <view class="btn-icon gyro-icon"></view>
+        </view>
+        
+        <!-- 帮助按钮 -->
+        <view class="control-button" bindtap="showHelpDialog">
+          <view class="btn-icon help-icon">?</view>
+        </view>
+      </view>
+    </view>
+  </view>
+  
+  <!-- 速度选择面板 -->
+  <view class="speed-panel {{speedPanelVisible ? 'visible' : 'hidden'}}">
+    <view class="speed-option {{playbackRate === 0.5 ? 'active' : ''}}" data-rate="0.5" bindtap="setPlaybackRate">0.5x</view>
+    <view class="speed-option {{playbackRate === 1.0 ? 'active' : ''}}" data-rate="1.0" bindtap="setPlaybackRate">1.0x</view>
+    <view class="speed-option {{playbackRate === 1.5 ? 'active' : ''}}" data-rate="1.5" bindtap="setPlaybackRate">1.5x</view>
+    <view class="speed-option {{playbackRate === 2.0 ? 'active' : ''}}" data-rate="2.0" bindtap="setPlaybackRate">2.0x</view>
+  </view>
+  
+  <!-- 音量滑块 -->
+  <view class="volume-slider-container {{volumeSliderVisible ? 'visible' : 'hidden'}}">
+    <slider min="0" max="1" step="0.01" value="{{volume}}" block-size="20" activeColor="#4DACFF" backgroundColor="#cccccc" bindchange="setVolume" />
+  </view>
+  
+  <!-- 陀螺仪提示 -->
+  <view class="gyro-guide {{gyroGuideVisible ? 'visible' : 'hidden'}}">
+    <view class="gyro-guide-inner">
+      <view class="gyro-icon-large"></view>
+      <text class="gyro-title">陀螺仪控制已启用</text>
+      <text class="gyro-desc">左右摇动：前进/后退15秒</text>
+      <text class="gyro-desc">上下摇动：调整音量</text>
+      <text class="gyro-desc">短促摇晃：播放/暂停</text>
+      <view class="gyro-close" bindtap="hideGyroGuide">知道了</view>
+      <checkbox class="gyro-checkbox" bindtap="toggleDontShowAgain">不再提示</checkbox>
+    </view>
+  </view>
+  
+  <!-- 帮助弹窗 -->
+  <view class="help-dialog {{helpDialogVisible ? 'visible' : 'hidden'}}">
+    <view class="help-dialog-inner">
+      <text class="help-title">控制说明</text>
+      <view class="help-item">
+        <text class="help-icon">▶</text>
+        <text class="help-text">点击播放/暂停视频</text>
+      </view>
+      <view class="help-item">
+        <text class="help-icon">↗</text>
+        <text class="help-text">进入/退出全屏模式</text>
+      </view>
+      <view class="help-item">
+        <text class="help-icon">3D</text>
+        <text class="help-text">开启/关闭3D效果</text>
+      </view>
+      <view class="help-item">
+        <text class="help-icon">双指</text>
+        <text class="help-text">缩放调整3D深度效果</text>
+      </view>
+      <view class="help-item">
+        <text class="help-icon">滑动</text>
+        <text class="help-text">左右滑动调整进度</text>
+      </view>
+      <view class="help-close" bindtap="hideHelpDialog">关闭</view>
+    </view>
+  </view>
+</view> 
