@@ -4,6 +4,7 @@
     "pages/index/index",
     "pages/video/video",
     "pages/create/create",
+    "pages/player/player",
     "pages/profile/profile"
   ],
   "window": {

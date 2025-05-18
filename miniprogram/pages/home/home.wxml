@@ -85,7 +85,7 @@
           <text class="nav-icon">🏠</text>
           <text>首页</text>
         </view>
-        <view class="nav-item">
+        <view class="nav-item" bindtap="navigateToVideo">
           <text class="nav-icon">🎥</text>
           <text>视频库</text>
         </view>
