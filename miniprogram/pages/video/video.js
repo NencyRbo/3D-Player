@@ -1,114 +1,181 @@
 // video.js
 Page({
   data: {
-    currentCategory: 'all',
-    videos: [
-      {
-        id: 1,
-        title: '如何制作3D全息投影展示',
-        thumbnail: '/images/video1.jpg',
-        duration: '08:45',
-        is3D: true
-      },
-      {
-        id: 2,
-        title: '电影《星际穿越》3D特效解析',
-        thumbnail: '/images/video2.jpg',
-        duration: '12:30',
-        is3D: true
-      },
-      {
-        id: 3,
-        title: '使用AR增强现实技术的应用案例',
-        thumbnail: '/images/video3.jpg',
-        duration: '05:15',
-        is3D: false
-      },
-      {
-        id: 4,
-        title: '体验VR世界的新方式',
-        thumbnail: '/images/video4.jpg',
-        duration: '07:20',
-        is3D: true
-      },
-      {
-        id: 5,
-        title: 'AI生成3D模型教程',
-        thumbnail: '/images/video5.jpg',
-        duration: '10:50',
-        is3D: true
-      },
-      {
-        id: 6,
-        title: '演示文稿的全息投影设计',
-        thumbnail: '/images/video6.jpg',
-        duration: '06:25',
-        is3D: true
-      }
-    ]
+    currentTab: 'all',
+    videos: [],
+    loading: true,
+    page: 1,
+    pageSize: 10,
+    hasMore: true,
+    searchKeyword: ''
   },
 
-  onLoad: function(options) {
-    // 可以根据options接收首页传递的参数
+  onLoad: function() {
+    this.loadVideos();
   },
 
-  // 切换分类
-  switchCategory: function(e) {
-    const category = e.currentTarget.dataset.category;
+  onShow: function() {
+    // Refresh videos list if coming back to this page
+    if (this.data.videos.length > 0) {
+      wx.startPullDownRefresh();
+    }
+  },
+
+  onPullDownRefresh: function() {
     this.setData({
-      currentCategory: category
+      videos: [],
+      page: 1,
+      hasMore: true
     });
-    // 这里可以根据分类加载不同的视频列表
+    this.loadVideos();
+    wx.stopPullDownRefresh();
   },
 
-  // 播放视频
+  loadVideos: function() {
+    if (!this.data.hasMore || this.data.loading) return;
+
+    this.setData({ loading: true });
+
+    // 模拟API请求，获取视频列表
+    // 实际应用中应替换为真实的API调用
+    setTimeout(() => {
+      // 模拟数据
+      const newVideos = this.getMockVideos(this.data.page, this.data.pageSize, this.data.currentTab, this.data.searchKeyword);
+
+      this.setData({
+        videos: [...this.data.videos, ...newVideos],
+        loading: false,
+        page: this.data.page + 1,
+        hasMore: newVideos.length === this.data.pageSize
+      });
+    }, 800);
+  },
+
+  getMockVideos: function(page, pageSize, tab, keyword) {
+    // 生成模拟视频数据
+    const mockVideos = [];
+    const startIndex = (page - 1) * pageSize;
+
+    // 视频类型标题前缀
+    const typePrefixes = {
+      'movie': '电影',
+      'short': '短视频',
+      'upload': '我的视频',
+      'ai': 'AI生成'
+    };
+
+    // 视频标题
+    const videoTitles = [
+      '探索未知的宇宙奥秘',
+      '海底世界的神秘生物',
+      '城市夜景的绚丽灯光',
+      '大自然的壮丽景观',
+      '科技创新改变生活',
+      '音乐会现场震撼瞬间',
+      '美食之旅的味蕾体验',
+      '极限运动的刺激挑战',
+      '历史遗迹的文明印记',
+      '艺术创作的无限想象'
+    ];
+
+    for (let i = 0; i < pageSize; i++) {
+      const index = startIndex + i;
+      // 当模拟数据超过40条时，停止生成
+      if (index >= 40) break;
+
+      // 根据tab筛选视频类型
+      let videoType = 'normal';
+      if (tab !== 'all') {
+        videoType = tab;
+      } else {
+        // 随机分配视频类型
+        const types = ['movie', 'short', 'upload', 'ai'];
+        videoType = types[Math.floor(Math.random() * types.length)];
+      }
+
+      // 生成视频标题
+      const titleIndex = index % videoTitles.length;
+      const prefix = videoType !== 'normal' ? typePrefixes[videoType] + '：' : '';
+      const title = prefix + videoTitles[titleIndex];
+
+      // 模拟关键词搜索
+      if (keyword && !title.toLowerCase().includes(keyword.toLowerCase())) continue;
+
+      // 视频时长，电影类型较长，短视频较短
+      let duration;
+      if (videoType === 'movie') {
+        const hours = Math.floor(Math.random() * 2) + 1;
+        const minutes = Math.floor(Math.random() * 60);
+        duration = `${hours}:${minutes.toString().padStart(2, '0')}`;
+      } else {
+        const minutes = videoType === 'short' ? 0 : Math.floor(Math.random() * 5);
+        const seconds = Math.floor(Math.random() * 60);
+        duration = minutes > 0 ?
+            `${minutes}:${seconds.toString().padStart(2, '0')}` :
+            `0:${seconds.toString().padStart(2, '0')}`;
+      }
+
+      mockVideos.push({
+        id: `video-${index}`,
+        title: title,
+        thumbnail: `https://picsum.photos/seed/video${index}/300/200`,
+        duration: duration,
+        is3D: videoType === 'movie' ? true : Math.random() > 0.7, // 电影类型全是3D，其他70%概率不是3D
+        type: videoType
+      });
+    }
+
+    return mockVideos;
+  },
+
+  switchTab: function(e) {
+    const tab = e.currentTarget.dataset.tab;
+    if (tab === this.data.currentTab) return;
+
+    this.setData({
+      currentTab: tab,
+      videos: [],
+      page: 1,
+      hasMore: true
+    });
+
+    this.loadVideos();
+  },
+
+  onSearchInput: function(e) {
+    this.setData({
+      searchKeyword: e.detail.value
+    });
+  },
+
+  onSearch: function(e) {
+    this.setData({
+      videos: [],
+      page: 1,
+      hasMore: true
+    });
+
+    this.loadVideos();
+  },
+
+  loadMoreVideos: function() {
+    if (this.data.hasMore) {
+      this.loadVideos();
+    }
+  },
+
   playVideo: function(e) {
     const videoId = e.currentTarget.dataset.id;
+    // 跳转到视频播放页
     wx.navigateTo({
-      url: `/pages/player/player?id=${videoId}`
+      url: '/miniprogram/pages/player/player?id=' + videoId
     });
   },
 
-  // 搜索视频
-  onSearch: function(e) {
-    const keyword = e.detail.value;
-    // 这里可以实现搜索逻辑
-    console.log('搜索关键词:', keyword);
-  },
-
-  // 上传视频
-  uploadVideo: function() {
-    wx.chooseMedia({
-      count: 1,
-      mediaType: ['video'],
-      sourceType: ['album', 'camera'],
-      success: (res) => {
-        const tempFilePath = res.tempFiles[0].tempFilePath;
-        // 处理上传逻辑
-        console.log('选择的视频:', tempFilePath);
-        wx.navigateTo({
-          url: '/pages/upload/upload?path=' + tempFilePath
-        });
-      }
-    });
-  },
-  
-  // 导航功能
-  navigateToHome: function() {
+  onUpload: function() {
+    // 跳转到上传页面
     wx.navigateTo({
-      url: '/pages/home/home'
-    });
-  },
-
-  navigateToCreate: function() {
-    wx.navigateTo({
-      url: '/pages/create/create'
-    });
-  },
-
-  navigateToProfile: function() {
-    wx.navigateTo({
-      url: '/pages/profile/profile'
+      url: '/miniprogram/pages/create/create'
     });
   }
-}); 
+});
